@@ -24,7 +24,7 @@ export default class main_loop extends Phaser.Scene {
 	create(){
 		this.map = this.add.tilemap("test")
 		var tileset = this.map.addTilesetImage("kingdom", "kingdom_tiles")
-		//this.map.createLayer("base_color", tileset)
+		this.map.createLayer("base_color", tileset)
 
 		this.player.create();
 		this.add.text(20,20, "savedata :"+this.load_data());
