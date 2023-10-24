@@ -1,72 +1,42 @@
-export default class Player {
-  keylog(){
-    this.space = this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
-    this.enter = this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
-    this.W = this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W);
-    this.A = this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
-    this.S = this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S);
-    this.D = this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
-    this.left = this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.left);
-    this.right = this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.right);
-    this.up = this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.up);
-    this.down = this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.down);
-  }
-  joystick(){
-    if(this.W.isDown || this.up.isDown){
-      this.joy[1] -=1
-    }
-    if(this.S.isDown || this.down.isDown){
-      this.joy[1] +=1
-    }
-    if(this.A.isDown || this.left.isDown){
-      this.joy[0] -=1
-    }
-    if(this.D.isDown || this.right.isDown){
-      this.joy[0] +=1
-    }
-    this.Njoy[0] = this.joy[0];
-    this.Njoy[1] = this.joy[1]
-    var m = 0.001+Math.sqrt((this.Njoy[0]*this.Njoy[0])+(this.Njoy[1]*this.Njoy[1]))
-    this.Njoy[0] = this.Njoy[0]/m
-    this.Njoy[1] = this.Njoy[1]/m
-  }
+import Player_sprite from "./player_sprite.js";
 
-  constructor(scene, physics) {
+export default class Player {
+  constructor(scene, physics, keylogger) {
     this.scene = scene;
     this.physics = physics;
+    this.keys = keylogger
+    this.player_sprite = new Player_sprite(scene, physics, this)
+    
+    this.hitbox_x = 58
+    this.hitbox_y = 48
   }
-  preload(){
+  preload() {
     this.scene.load.image("player", "Sprites/Player/PlayerTemp.png");
+    this.player_sprite.preload()
     this.action = "MOVE";
   }
-  create(){
-    this.player = this.physics.add.sprite(200, 200, "player"); 
-    this.keylog()
-    this.v = [0,0]
-    this.joy = [0,0]
-    this.Njoy = [0,0]
-
+  create() {
+    this.player = this.scene.add.rectangle(200, 200, this.hitbox_x, this.hitbox_y);
+    this.player.setFillStyle(0xf0f0ff, 0)
+    this.scene.physics.add.existing(this.player);
+    this.player_sprite.create()
+    this.v = [0, 0]
   }
-  update(){
-    this.joystick()
-
+  update() {
     this.action_switch()
-
     this.player.body.setVelocityX(this.v[0])
     this.player.body.setVelocityY(this.v[1])
-    this.v = [0,0]
-    this.joy = [0,0]
-    this.Njoy = [0,0]
+    this.player_sprite.update(this.player)
+    this.v = [0, 0]
   }
 
-  action_switch(){
-    if(this.action=="MOVE"){
+  action_switch() {
+    if (this.action == "MOVE") {
       this.move();
     }
   }
-
-  move(){
-    this.v[0] = this.Njoy[0]*100
-    this.v[1] = this.Njoy[1]*100
+  move() {
+    this.v[0] = this.keys.Njoy[0] * 100
+    this.v[1] = this.keys.Njoy[1] * 100
   }
 }
